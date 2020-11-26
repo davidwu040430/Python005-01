@@ -3,22 +3,23 @@ import logging
 import os
 import sys
 import time
+from pathlib import Path
 
 
 def log_call():
+    systemlogdir = Path('/var/log')
+    # systemlogdir = Path('/Users/davidwu/learn_python/playground')
     today = datetime.date.today().strftime('%Y%m%d')
-    logdir = '/var/log/python-' + today
+    logdir = systemlogdir.joinpath('python-{}'.format(today))
+    logfile = logdir.joinpath('xxxx.log')
     
-    # logdir = '/Users/davidwu/learn_python/playground/' + today
     # 检查日志目录是否存在，如不存在则创建目录
-    if not os.path.isdir(logdir):
+    if not logdir.is_dir():
         try:
-            os.mkdir(logdir)
+            os.makedirs(logdir)
         except OSError as err:
             print('Create log directory failed: {}'.format(err))
             sys.exit(1)
-    
-    logfile = logdir + '/xxxx.log'
 
     # 配置日志的文件、级别、格式
     logging.basicConfig(filename=logfile,
