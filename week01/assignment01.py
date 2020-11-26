@@ -16,6 +16,7 @@ def log_call():
     # 检查日志目录是否存在，如不存在则创建目录
     if not logdir.is_dir():
         try:
+            # 使用makedirs来确保建立路径上所有的目录
             os.makedirs(logdir)
         except OSError as err:
             print('Create log directory failed: {}'.format(err))
