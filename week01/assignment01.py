@@ -12,7 +12,7 @@ def log_call():
     today = datetime.date.today().strftime('%Y%m%d')
     logdir = systemlogdir.joinpath('python-{}'.format(today))
     logfile = logdir.joinpath('xxxx.log')
-    
+
     # 检查日志目录是否存在，如不存在则创建目录
     if not logdir.is_dir():
         try:
@@ -27,10 +27,10 @@ def log_call():
                         level=logging.DEBUG,
                         datefmt='%Y-%m-%d %X',
                         format='%(asctime)s %(name)-8s %(levelname)-8s %(message)s')
-    
+
     # 日志记录函数被调用的时间
     logging.info("It's called in: {}".format(time.ctime()))
 
+
 if __name__ == '__main__':
     log_call()
-
