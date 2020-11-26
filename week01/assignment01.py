@@ -1,8 +1,9 @@
-import logging
 import datetime
-import time
+import logging
 import os
 import sys
+import time
+
 
 def log_call():
     today = datetime.date.today().strftime('%Y%m%d')
