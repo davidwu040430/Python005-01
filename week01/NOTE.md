@@ -5,3 +5,5 @@
 3. vscode怎么用venv，感觉没有pycharm直接，也需要再研究（已经解决，https://stackoverflow.com/a/61092957）
 4. 学会使用.gitignore来忽略不需要同步的.vscode, .venv以及.gitignore自己
 
+github端测试冲突
+
