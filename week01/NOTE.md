@@ -6,4 +6,5 @@
 4. 学会使用.gitignore来忽略不需要同步的.vscode, .venv以及.gitignore自己
 
 测试一下冲突
+github端测试冲突
 
