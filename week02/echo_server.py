@@ -4,14 +4,19 @@ import time
 import os
 import sys
 import logging
+from pathlib import Path
 
 HOST = 'localhost'
 PORT = 60000
 
 def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((HOST, PORT))
-    s.listen(5)
+    try:
+        s.bind((HOST, PORT))
+        s.listen(5)
+    except Exception e:
+        logging.critical(f'Lesten {HOST}:{PORT} failed: {e}')
+        sys.exit(1)
     logging.info('服务器socket设置完成：{}:{}'.format(HOST, PORT))
 
     try:
@@ -91,7 +96,7 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
 
 def config_logging():
     loglevel = logging.DEBUG
-    logfile = './echo_server.log'
+    logfile = Path(__file__).parent.joinpath('echo_server.log')
     logging.basicConfig(filename=logfile,
                         level=loglevel,
                         datefmt='%Y-%m-%d %X',
