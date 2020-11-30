@@ -8,13 +8,14 @@ from pathlib import Path
 
 HOST = 'localhost'
 PORT = 60000
+DEBUG = True
 
 def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         s.bind((HOST, PORT))
         s.listen(5)
-    except Exception e:
+    except Exception as e:
         logging.critical(f'Lesten {HOST}:{PORT} failed: {e}')
         sys.exit(1)
     logging.info('服务器socket设置完成：{}:{}'.format(HOST, PORT))
@@ -44,9 +45,12 @@ def echo_server(conn, addr):
             break
         else:
             str_get = buf.decode('utf-8')
-            logging.debug('接收到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], str_get))
-            conn.sendall(buf)
-            logging.debug('发送到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], str_get))
+            if str_get.split()[0] == 'put':
+                logging.debug('Get a put')
+            else:
+                logging.debug('接收到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], str_get))
+                conn.sendall(buf)
+                logging.debug('发送到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], str_get))
     conn.close()
     logging.info('客户端退出, 客户端 {}:{}, pid: {}'.format(addr[0], addr[1], os.getpid()))
 
@@ -96,7 +100,10 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
 
 def config_logging():
     loglevel = logging.DEBUG
-    logfile = Path(__file__).parent.joinpath('echo_server.log')
+    if DEBUG:
+        logfile = '/dev/stdout'
+    else:
+        logfile = Path(__file__).parent.joinpath('echo_server.log')
     logging.basicConfig(filename=logfile,
                         level=loglevel,
                         datefmt='%Y-%m-%d %X',
@@ -105,5 +112,6 @@ def config_logging():
 
 if __name__ == '__main__':
     config_logging()
-    daemonize()
+    if not DEBUG:
+        daemonize()
     main()
