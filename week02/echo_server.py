@@ -44,15 +44,43 @@ def echo_server(conn, addr):
         if not buf:
             break
         else:
-            str_get = buf.decode('utf-8')
-            if str_get.split()[0] == 'put':
-                logging.debug('Get a put')
+            command = buf.decode('utf-8')
+            if command.split()[0].lower() == 'put':
+                logging.debug(f'Get a put: {command}')
+                server_put(command, conn)
+            elif command.split()[0].lower() == 'get':
+                logging.debug(f'Get a put: {command}')
+                server_get(command, conn)
             else:
-                logging.debug('接收到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], str_get))
+                logging.debug('接收到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], command))
                 conn.sendall(buf)
-                logging.debug('发送到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], str_get))
+                logging.debug('发送到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], command))
     conn.close()
     logging.info('客户端退出, 客户端 {}:{}, pid: {}'.format(addr[0], addr[1], os.getpid()))
+
+def server_put(command, conn):
+    print(command)
+    comm, src_file, target_file, size = command.split()
+    target_file = './test.log'
+    if not src_file:
+        conn.sendall(b'Sorry, wrong command')
+    else:
+        if target_file:
+            with open(target_file, 'wb') as f:
+                r_size = 0
+                while r_size < int(size):
+                    buf = conn.recv(1024)
+                    r_size += len(buf)
+                    print(buf.decode('utf-8'))
+                    if not buf:
+                        break
+                    else:
+                        f.write(buf)
+        else:
+            pass
+
+def server_get(command, conn):
+    pass
 
 # 启动守护进程
 def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
