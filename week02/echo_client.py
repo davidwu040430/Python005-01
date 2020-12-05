@@ -31,7 +31,7 @@ def echo_client():
         if not data:
             break
         else:
-            print(data)
+            print(data.decode('utf-8'))
     s.close()
 
 def client_put(data, s):
@@ -69,7 +69,6 @@ def client_put(data, s):
         print(response.decode('utf-8'))
 
 def client_get(msg, s):
-    print('{}'.format(msg))
     elements = msg.split()
     if len(elements) == 2:
         source_file = elements[1]
@@ -79,7 +78,6 @@ def client_get(msg, s):
         target_file = elements[2]
     else:
         print('Error: 命令格式错误')
-    print(f'{source_file} {target_file}')
     filename = Path(source_file).name
     if target_file == None:
         target_p = Path(__file__).parent.joinpath('recv', filename)
@@ -92,7 +90,6 @@ def client_get(msg, s):
     
     target_dir = target_p.parent
     filename = target_p.name
-    print(f'File: {filename}, Directory: {target_dir}')
     try:
         target_dir.mkdir(parents=True, exist_ok=True)
         with open(target_p, 'wb') as f:
