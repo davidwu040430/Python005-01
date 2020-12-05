@@ -11,7 +11,9 @@ def echo_client():
 
     while True:
         # 接收用户输入
-        data = input('input > ')
+        data = input('input > '):
+        if not data:
+            continue
         # 设定退出条件
         if data == 'exit':
             break
@@ -31,20 +33,39 @@ def echo_client():
     s.close()
 
 def client_put(data, s):
-    comm, src_file, target_file = data.split()
-    src_file = './echo_server.log'
-    src_p = Path(src_file)
-    print(src_p.stat())
-    size = src_p.stat().st_size
-    s.sendall('{} {}'.format(data, size).encode('utf-8'))
-    # s.sendall(data.encode('utf-8'))
-    with open(src_file, 'rb') as f:
-        while True:
-            file_data = f.read(1024)
-            if not file_data:
-                break
-            print(file_data.decode('utf-8'))
-            s.sendall(file_data)
+    elements = data.split()
+    # 根据命令的不同参数个数来赋值
+    src_p = Path(elements[1])
+    if len(elements) == 2:
+        source_file = elements[1]
+        target_file = None
+    elif len(elements) == 3:
+        source_file = elements[1]
+        target_file = elements[2]
+    else:
+        print('Error: 错误命令')
+        return
+    
+    src_p = Path(source_file)
+    # src_p如果不是文件，打印错误信息返回
+    if not src_p.is_file():
+        print("'{}' should be a file".format(src_p))
+        return
+    # 获取文件的尺寸，发送给服务器端
+    s.sendall('{} {} {} {}'.format('PUT', elements[1], target_file, src_p.stat().st_size).encode('utf-8'))
+
+    # 接受服务器端的回复，OK开始传送文件，ERROR表示有错误发送，显示错误信息
+    response = s.recv(1024)
+    if response.decode('utf-8').startswith("OK"):
+        with open(src_p, 'rb') as f:
+            while True:
+                file_data = f.read(1024)
+                if not file_data:
+                    break
+                print(file_data.decode('utf-8'))
+                s.sendall(file_data)
+    else:
+        print(response.decode('utf-8'))
 
 if __name__ == '__main__':
     echo_client()

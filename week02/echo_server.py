@@ -45,30 +45,56 @@ def echo_server(conn, addr):
             break
         else:
             command = buf.decode('utf-8')
+            logging.debug('接收到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], command))
             if command.split()[0].lower() == 'put':
-                logging.debug(f'Get a put: {command}')
+                logging.debug(f'收到一个put请求: {command}')
                 server_put(command, conn)
             elif command.split()[0].lower() == 'get':
-                logging.debug(f'Get a put: {command}')
+                logging.debug(f'收到一个get请求: {command}')
                 server_get(command, conn)
             else:
-                logging.debug('接收到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], command))
                 conn.sendall(buf)
                 logging.debug('发送到客户端 {}:{} 内容：{}'.format(addr[0], addr[1], command))
     conn.close()
     logging.info('客户端退出, 客户端 {}:{}, pid: {}'.format(addr[0], addr[1], os.getpid()))
 
 def server_put(command, conn):
-    print(command)
-    comm, src_file, target_file, size = command.split()
-    target_file = './test.log'
-    if not src_file:
-        conn.sendall(b'Sorry, wrong command')
+    # 检查put命令是否是3个参数，如果不是，发送错误回应，并返回
+    if len(command.split()) != 4:
+        conn.sendall("Error: 错误的命令，正确命令应该为 put source_file [None|target_dir|target_file] size.".encode('utf-8'))
     else:
-        if target_file:
-            with open(target_file, 'wb') as f:
+        _, src_file, target_file, file_size = command.split()
+        filename = Path(src_file).name
+        # 如果没有指定目标目录，则为当前目录下的recv目录
+        if target_file == 'None':
+            target_p = Path(__file__).resolve().parent.joinpath('recv', filename)
+        else:
+            if target_file[-1] == '/':
+                target_p = Path(target_file).joinpath(filename)
+            else:
+                target_p = Path(target_file)
+                if target_p.is_dir():
+                    target_p = target_p.joinpath(filename)
+        
+        # 取出目录和文件名
+        target_dir = target_p.parent
+        filename = target_p.name
+        try:
+            target_dir.mkdir(parents=True, exist_ok=True)
+            with open(target_p, 'wb') as f:
+                pass
+        except Exception as e:
+            logging.critical('Error: {}'.format(e))
+            conn.sendall('Error: {}'.format(e).encode('utf-8'))
+            return        
+        
+        logging.debug('文件名: {}, 目标目录：{}'.format(filename, target_dir))
+        # 一切正常，则向客户端返回OK
+        conn.sendall(b'OK: Server is ready to recieve file.')
+        try:
+            with open(target_p, 'wb') as f:
                 r_size = 0
-                while r_size < int(size):
+                while r_size < int(file_size):
                     buf = conn.recv(1024)
                     r_size += len(buf)
                     print(buf.decode('utf-8'))
@@ -76,8 +102,10 @@ def server_put(command, conn):
                         break
                     else:
                         f.write(buf)
-        else:
-            pass
+        except Exception as e:
+            conn.sendall(b'Error: Server side error occured {}'.format(e))
+            logging.critical('Error: {}'.format(e))
+        logging.debug('接受文件完成，{}，文件大小：{}'.format(target_p, file_size))
 
 def server_get(command, conn):
     pass
