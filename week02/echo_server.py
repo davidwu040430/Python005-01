@@ -127,19 +127,20 @@ def server_get(command, conn):
                 conn.sendall('Error: 读取文件错误'.encode('utf-8'))
                 return
             conn.sendall('OK {}'.format(src_p.stat().st_size).encode('utf-8'))
-            # 开始传输文件
-            try:
-                with open(src_p, 'rb') as f:
-                    while True:
-                        file_data = f.read(1024)
-                        if not file_data:
-                            break
-                        conn.sendall(file_data)
-            except Exception as e:
-                logging.critical('Error: 发送文件时候出错: {}'.format(e))
-            logging.info('发送文件{}成功'.format(src_p))
-            conn.sendall('Succeed')
-
+            response = conn.recv(1024)
+            if response.decode('utf-8').startswith('OK'):
+                # 开始传输文件
+                try:
+                    with open(src_p, 'rb') as f:
+                        while True:
+                            file_data = f.read(1024)
+                            if not file_data:
+                                break
+                            conn.sendall(file_data)
+                except Exception as e:
+                    logging.critical('Error: 发送文件时候出错: {}'.format(e))
+                logging.info('发送文件{}成功'.format(src_p))
+                conn.sendall('Succeed'.encode('utf-8'))
 
 # 启动守护进程
 def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):

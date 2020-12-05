@@ -11,16 +11,16 @@ def echo_client():
 
     while True:
         # 接收用户输入
-        msg = input('input > '):
+        msg = input('input > ')
         # 如果直接回车，跳过后面的处理，直接要求用户再次输入
         if not msg:
             continue
         # 如果输入exit，退出
         elif msg == 'exit':
             break
-        elif msg[:4].upper == 'PUT ':
+        elif msg[:4].upper() == 'PUT ':
             client_put(msg, s)
-        elif msg[:4].upper == 'GET ':  
+        elif msg[:4].upper() == 'GET ':  
             client_get(msg, s)  
         else:
         # 发送数据到服务器
@@ -31,7 +31,7 @@ def echo_client():
         if not data:
             break
         else:
-            print(data.decode('utf-8'))
+            print(data)
     s.close()
 
 def client_put(data, s):
@@ -69,7 +69,8 @@ def client_put(data, s):
         print(response.decode('utf-8'))
 
 def client_get(msg, s):
-    elements = mgs.split()
+    print('{}'.format(msg))
+    elements = msg.split()
     if len(elements) == 2:
         source_file = elements[1]
         target_file = None
@@ -78,12 +79,12 @@ def client_get(msg, s):
         target_file = elements[2]
     else:
         print('Error: 命令格式错误')
-    
+    print(f'{source_file} {target_file}')
     filename = Path(source_file).name
     if target_file == None:
         target_p = Path(__file__).parent.joinpath('recv', filename)
     elif target_file[-1] == '/':
-        target_p = Path(targt_file).joinpaht(filename)
+        target_p = Path(target_file).joinpath(filename)
     else:
         target_p = Path(target_file)
         if target_p.is_dir():
@@ -104,11 +105,12 @@ def client_get(msg, s):
     s.sendall('GET {} {}'.format(source_file, target_p).encode('utf-8'))
 
     # 接受反馈, 按照协议，服务器端应该回传：OK size，或者Error error message
-    rsponse = s.recv(1024)
+    response = s.recv(1024)
     if response.decode('utf-8').startswith('OK'):
+        s.sendall(b'OK')
         file_size = int(response.split()[1])
         try:
-            while open(target_p, 'wb') as f:
+            with open(target_p, 'wb') as f:
                 r_size = 0
                 while r_size < file_size:
                     buf = s.recv(1024)
@@ -121,14 +123,10 @@ def client_get(msg, s):
             print(f'Error {e}')
             s.sendall(f'Error {e}'.encode('utf-8'))
             return
-        s.sendall('Succeed')
+        s.sendall(b'Succeed')
     else:
         print(response.decode('utf-8'))
         
-
-
-
-
 
 if __name__ == '__main__':
     echo_client()
