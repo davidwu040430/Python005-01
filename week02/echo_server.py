@@ -105,10 +105,41 @@ def server_put(command, conn):
         except Exception as e:
             conn.sendall(b'Error: Server side error occured {}'.format(e))
             logging.critical('Error: {}'.format(e))
+            return
+        # 向客户端发送成功的msg
+        conn.sendall('Succeed!')
         logging.debug('接受文件完成，{}，文件大小：{}'.format(target_p, file_size))
 
 def server_get(command, conn):
-    pass
+    elements = command.split()
+    if len(elements) != 3:
+        conn.sendall('Error: 参数数量错误'.encode('utf-8'))
+    else:
+        src_file = elements[1]
+        src_p = Path(src_file)
+        if not src_p.is_file():
+            conn.sendall('Error: 文件没有找到'.encode('utf-8'))
+        else:
+            try:
+                with open(src_p, 'rb') as f:
+                    pass
+            except Exception as e:
+                conn.sendall('Error: 读取文件错误'.encode('utf-8'))
+                return
+            conn.sendall('OK {}'.format(src_p.stat().st_size).encode('utf-8'))
+            # 开始传输文件
+            try:
+                with open(src_p, 'rb') as f:
+                    while True:
+                        file_data = f.read(1024)
+                        if not file_data:
+                            break
+                        conn.sendall(file_data)
+            except Exception as e:
+                logging.critical('Error: 发送文件时候出错: {}'.format(e))
+            logging.info('发送文件{}成功'.format(src_p))
+            conn.sendall('Succeed')
+
 
 # 启动守护进程
 def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
