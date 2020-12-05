@@ -11,18 +11,20 @@ def echo_client():
 
     while True:
         # 接收用户输入
-        data = input('input > '):
-        if not data:
+        msg = input('input > '):
+        # 如果直接回车，跳过后面的处理，直接要求用户再次输入
+        if not msg:
             continue
-        # 设定退出条件
-        if data == 'exit':
+        # 如果输入exit，退出
+        elif msg == 'exit':
             break
-        if data.split()[0].lower() == 'put':
-            client_put(data, s)
-            continue
+        elif msg[:4].upper == 'PUT ':
+            client_put(msg, s)
+        elif msg[:4].upper == 'GET ':  
+            client_get(msg, s)  
         else:
         # 发送数据到服务器
-            s.sendall(data.encode('utf-8'))
+            s.sendall(msg.encode('utf-8'))
 
         # 接受服务器数据
         data = s.recv(1024)
@@ -66,6 +68,9 @@ def client_put(data, s):
                 s.sendall(file_data)
     else:
         print(response.decode('utf-8'))
+
+def client_get(msg, s):
+    pass
 
 if __name__ == '__main__':
     echo_client()
