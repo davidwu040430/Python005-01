@@ -140,7 +140,8 @@ def server_get(command, conn):
                 except Exception as e:
                     logging.critical('Error: 发送文件时候出错: {}'.format(e))
                 logging.info('发送文件{}成功'.format(src_p))
-                conn.sendall('Succeed'.encode('utf-8'))
+            response = conn.recv(1024)
+            logging.debug('从客户端收到: {}'.format(response.decode('utf-8')))
 
 # 启动守护进程
 def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
