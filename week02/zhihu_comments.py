@@ -28,6 +28,7 @@ class CrawlThread(threading.Thread):
 
                 try:
                     response = requests.get(url, headers=self.headers)
+                    # 由于知乎api不回复encoding，所以request的自动解析会解析错，形成乱码，所以直接手动解析
                     dataQueue.put(response.content.decode('utf-8'))
                 except Exception as e:
                     logging.error(f'下载出现异常：{e}')
@@ -46,13 +47,14 @@ class ParseThread(threading.Thread):
         logging.info(f'启动解析线程：{self.thread_id}')
         while not self.flag['crawl_end']:
             try:
-                page = self.queue.get(False)
-                if not page:
-                    continue
-                self.parse_data(page)
-                self.queue.task_done()
+                while not self.queue.empty():
+                    page = self.queue.get()
+                    self.parse_data(page)
+                    self.queue.task_done()
             except Exception as e:
-                pass
+                logging.error(f'{self.thread_id} 出现错误：{e}')
+            logging.info(f'{self.thread_id} 结果队列里面没有结果，等待3秒')
+            sleep(3)
         logging.info(f'解析线程结束：{self.thread_id}')
     
     def parse_data(self, page):
@@ -81,12 +83,16 @@ class ParseThread(threading.Thread):
 
 
 if __name__ == '__main__':
+    # 标志位，一个是判断是否会有新增url，一个判断爬虫线程是否已经结束
     flag = {'url_end': False,
             'crawl_end': False
     }
+    # 配置logging
     logging.basicConfig(level=logging.DEBUG,
                         datefmt='%Y-%m-%d %X',
                         format='%(asctime)s %(levelname)-8s %(message)s')
+
+    # 两个队列，一个是url队列，一个是结果队列
     pageQueue = Queue(20)
     pageQueue.put('https://www.zhihu.com/api/v4/zvideos/1302663458526101504/root_comments?order=normal&limit=20&offset=0&status=open')
 
@@ -109,6 +115,7 @@ if __name__ == '__main__':
             thread.start()
             parse_thread.append(thread)
         
+        # 等待线程结束
         for t in crawl_thread:
             t.join()
         
