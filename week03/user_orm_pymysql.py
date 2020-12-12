@@ -7,6 +7,7 @@ from datetime import datetime
 # 用ORM创建表格
 Base = declarative_base()
 
+
 class User_table(Base):
     __tablename__ = 'user_orm'
     id = Column(Integer(), primary_key=True)
@@ -16,20 +17,26 @@ class User_table(Base):
     gender = Column(String(5))
     education = Column(String(20))
     created_on = Column(DateTime(), default=datetime.now)
-    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
+    updated_on = Column(DateTime(), default=datetime.now,
+                        onupdate=datetime.now)
+
 
 dburl = "mysql+pymysql://testuser:WyqWys75$@ec2-3-137-159-11.us-east-2.compute.amazonaws.com:3306/testdb"
 engine = create_engine(dburl, echo=True, encoding='utf-8')
 # Base.metadata.create_all(engine)
 
 # 用pymysql插入三条数据
-db = pymysql.connect("ec2-3-137-159-11.us-east-2.compute.amazonaws.com", "testuser", "WyqWys75$", "testdb")
+db = pymysql.connect("ec2-3-137-159-11.us-east-2.compute.amazonaws.com",
+                     "testuser", "WyqWys75$", "testdb")
 try:
     sql = '''INSERT INTO user_orm (name, age, birthday, gender, education, created_on, updated_on) VALUES (%s, %s, %s, %s, %s, %s, %s)'''
     values = (
-        ('David Wu', 42, '1978-1-12', 'M', 'Bachelor', datetime.now(), datetime.now()),
-        ('Frank Lin', 30, '1990-10-24', 'M', 'Master', datetime.now(), datetime.now()),
-        ('Ella Wang', 20, '2000-08-24', 'M', 'High School', datetime.now(), datetime.now())
+        ('David Wu', 42, '1978-1-12', 'M',
+         'Bachelor', datetime.now(), datetime.now()),
+        ('Frank Lin', 30, '1990-10-24', 'M',
+         'Master', datetime.now(), datetime.now()),
+        ('Ella Wang', 20, '2000-08-24', 'M',
+         'High School', datetime.now(), datetime.now())
     )
     with db.cursor() as cursor:
         cursor.executemany(sql, values)
@@ -52,7 +59,3 @@ except Exception as e:
     print(f'SELECT error: {e}')
 finally:
     db.close()
-
-
-
-
