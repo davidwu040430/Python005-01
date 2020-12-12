@@ -36,6 +36,20 @@ try:
     db.commit()
 except Exception as e:
     print(f'Insert error: {e}')
+# finally:
+#    db.close()
+
+# 用pymysql查询所有的数据
+try:
+    sql = '''SELECT name, age, birthday, gender, education FROM user_orm'''
+    with db.cursor() as cursor:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for result in results:
+            print(result)
+    db.commit()
+except Exception as e:
+    print(f'SELECT error: {e}')
 finally:
     db.close()
 
