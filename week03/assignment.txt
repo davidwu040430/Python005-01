@@ -1,0 +1,45 @@
+1.
+show variables like '%character%';
+set character_set_server='utf8mb4';
+
+CREATE DATABASE testdb;
+
+CREATE USER 'testuser' IDENTIFIED BY 'testpass8T#';
+GRANT ALL ON testdb.* TO 'testuser'@'%';
+
+3.
+SELECT DISTINCT player_id, player_name, count(*) as num  # 5
+FROM player JOIN team ON player.team_id = team.team_id   # 1
+WHERE height > 1.80                                      # 2
+GROUP BY player.team_id                                  # 3
+HAVING num > 2                                           # 4
+ORDER BY num DESC                                        # 6
+LIMIT 2                                                  # 7
+
+4.
+INNER JOIN:
+table1.id      table1.name     table2.id        table2.name
+1               table1_table2   1               table1_table2
+
+LEFT JOIN:
+table1.id      table1.name     table2.id        table2.name
+1               table1_table2   1               table1_table2
+2               table1          NULL            NULL
+
+RIGHT JOIN:
+table1.id      table1.name     table2.id        table2.name
+1               table1_table2   1               table1_table2
+NULL            NULL            3               table2
+
+5.
+CREATE INDEX ix_table1_name ON table1(name)
+CREATE INDEX ix_table2_name ON table2(name)
+id都是primary key缺省就已经索引。
+因为这两个表记录都很少，添加索引和不添加索引都没看出什么速度的变化
+从理论上看，添加在name的索引，不会用于基于id互相关联的join查询，所以创建索引并不会提升速度
+在什么情况索引有用：
+表的主关键字
+直接用在条件查询里的字段
+查询中和其他表关联的字段
+查询中排序的字段
+查询中统计或分组统计的字段
