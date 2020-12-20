@@ -4,10 +4,16 @@ from .models import Review
 # Create your views here.
 
 def movie_review(request):
-    # 所有的评论
-    reviews = Review.objects.all()
-    # 评论数量
-    counter = Review.objects.all().count()
+    query = request.GET.get('q')
+    if not query:
+        # 所有的评论
+        reviews_all = Review.objects.all()
+        # 评分大于3分的评论
+        condition = {'rate__gte': 3.0}
+        reviews = reviews_all.filter(**condition)
+        count = reviews.count()
+    else:
+        reviews = Review.objects.filter(content__icontains=query)
+        count = reviews.count()
 
-    # 评分大于3分的评论
     return render(request, 'index.html', locals())
