@@ -1,9 +1,9 @@
 .venv
 .vscode
-week04/Toffino/crawler/douban_review.py
+*.pyc
 week04/Toffino/crawler/*.html
-
-week04/Toffino/Douban/__pycache__/
-week04/Toffino/Toffino/__pycache__/
-week04/Toffino/Douban/migrations/__pycache__/
-week04/Toffino/Toffino/__pycache__/settings.cpython-37.pyc
+week04/.DS_Store
+week04/Toffino/.DS_Store
+week04/Toffino/Douban/.DS_Store
+week04/Toffino/Douban/templates/.DS_Store
+.DS_Store
