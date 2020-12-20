@@ -17,15 +17,18 @@ def parse_page(page_content):
     comments = html.xpath("//div[@class='comment']")
     # 遍历评论块， 取出详细内容
     for comment in comments:
-        author = comment.xpath(".//span[@class='comment-info']/a/text()")[0]
-        created_on = comment.xpath(".//span[@class='comment-time ']/text()")[0].strip()
-        content = comment.xpath(".//span[@class='short']/text()")[0]
-        rate_str = comment.xpath(".//span[@class='comment-info']/span[2]/@class")[0]
-        rate = re.search('\d\d', rate_str).group(0)
-        rate = int(rate)/10
-        result = [author, content, created_on, rate]
-        results.append(result)
-        logging.debug(f'result: {result}')
+        try:
+            author = comment.xpath(".//span[@class='comment-info']/a/text()")[0]
+            created_on = comment.xpath(".//span[@class='comment-time ']/text()")[0].strip()
+            content = comment.xpath(".//span[@class='short']/text()")[0]
+            rate_str = comment.xpath(".//span[@class='comment-info']/span[2]/@class")[0]
+            rate_re = 'allstar(.+)0'
+            rate = re.findall(rate_re, rate_str)[0]
+            result = [author, content, created_on, rate]
+            results.append(result)
+            logging.debug(f'result: {result}')
+        except Exception as e:
+            logging.error(f'抽取时有错误发生：{e}')
     
     next_url = html.xpath("//div[@id='paginator']/a[@class='next']/@href")
     next_url = next_url[0] if len(next_url) else None
@@ -91,7 +94,8 @@ if __name__ == '__main__':
         results, next_url = parse_page(page)
         logging.info(f'下一页url: {next_url}')
         # 插入数据库
-        insert_db(results, db_conn)
+        if not DEBUG:
+            insert_db(results, db_conn)
         logging.info('等待10秒')
         sleep(10)
     logging.info('爬取结束')
