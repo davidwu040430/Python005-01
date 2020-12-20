@@ -3,3 +3,7 @@
 week04/Toffino/crawler/douban_review.py
 week04/Toffino/crawler/*.html
 
+week04/Toffino/Douban/__pycache__/
+week04/Toffino/Toffino/__pycache__/
+week04/Toffino/Douban/migrations/__pycache__/
+week04/Toffino/Toffino/__pycache__/settings.cpython-37.pyc
