@@ -66,22 +66,26 @@ session = SessionClass()
 # 执行转账动作
 # from_id = 3, to_id = 4, amount = 100
 # 先写入审计表
-session.add(Transaction_table(from_id=3, to_id=4, amount=150.0))
+try:
+    session.add(Transaction_table(from_id=3, to_id=4, amount=150.0))
 
-# 检查转出方余额，是否小于转出额，如果是，rollback
-query = session.query(Asset_table).filter(Asset_table.user_id == 3)
-balance = query.first().balance
-if balance < 150:
-    # 回滚
-    session.rollback()
-else:
-    # 计算新的balance，update
-    new_balance = balance - 150
-    query.update({Asset_table.balance: new_balance})
-    # 计算接收方新的余额
-    query = session.query(Asset_table).filter(Asset_table.user_id == 4)
+    # 检查转出方余额，是否小于转出额，如果是，rollback
+    query = session.query(Asset_table).filter(Asset_table.user_id == 3)
     balance = query.first().balance
-    new_balance = balance + 150
-    query.update({Asset_table.balance: new_balance})
-    # 提交
-    session.commit()
+    if balance < 150:
+        # 回滚
+        session.rollback()
+    else:
+        # 计算新的balance，update
+        new_balance = balance - 150
+        query.update({Asset_table.balance: new_balance})
+        # 计算接收方新的余额
+        query = session.query(Asset_table).filter(Asset_table.user_id == 4)
+        balance = query.first().balance
+        new_balance = balance + 150
+        query.update({Asset_table.balance: new_balance})
+        # 提交
+        session.commit()
+except Exception as e:
+    session.rollback()
+    print(f'Error: {e}, roll back')
