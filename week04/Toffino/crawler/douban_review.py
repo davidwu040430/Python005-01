@@ -33,7 +33,6 @@ def parse_page(page_content):
     
     next_url = html.xpath("//div[@id='paginator']/a[@class='next']/@href")
     next_url = next_url[0] if len(next_url) else None
-    logging.info(f'next_url: {next_url}')
 
     # 调试时只抓取第一页，所以要把下一页的url置为空
     if DEBUG:
