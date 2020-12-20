@@ -23,10 +23,11 @@ def parse_page(page_content):
             content = comment.xpath(".//span[@class='short']/text()")[0]
             rate_str = comment.xpath(".//span[@class='comment-info']/span[2]/@class")[0]
             rate_re = 'allstar(.+)0'
-            rate = re.findall(rate_re, rate_str)[0]
+            rate = re.findall(rate_re, rate_str)
+            rate = rate[0] if len(rate) else 0
             result = [author, content, created_on, rate]
             results.append(result)
-            logging.debug(f'result: {result}')
+#            logging.debug(f'result: {result}')
         except Exception as e:
             logging.error(f'抽取时有错误发生：{e}')
     
@@ -85,6 +86,8 @@ if __name__ == '__main__':
             # 如果不存在，则进行抓取，并将内容存入文件
             url = url_prefix + next_url
             logging.info(f'开始抓取: {url}')
+            logging.info('等待10秒')
+            sleep(10)
             page = requests.get(url, headers=headers).text
             logging.info(f'抓取结束: {url}')
             with open(file, 'w', encoding='utf-8') as f:
@@ -96,8 +99,7 @@ if __name__ == '__main__':
         # 插入数据库
         if not DEBUG:
             insert_db(results, db_conn)
-        logging.info('等待10秒')
-        sleep(10)
+        
     logging.info('爬取结束')
 
 
