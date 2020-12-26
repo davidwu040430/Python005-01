@@ -1,4 +1,5 @@
 import redis
+import math
 
 
 def sendsms(telephone_number, content, key=None):
@@ -11,10 +12,13 @@ def sendsms(telephone_number, content, key=None):
     if result > 5:
         print('Quota used out, please wait for 60s and retry!')
     else:
-        print("send to {} with content '{}'".format(telephone_number, content))
+        # 按照70字符一条发送
+        n = math.ceil(len(content)/70)
+        for i in range(n):
+            print("send to {} with content '{}'".format(telephone_number, content[70*i:70*(i+1)]))
+        # 如果是1说明是新开始，设置过期时间
         if result == 1:
             client.expire(telephone_number, 60)
 
-
 if __name__ == '__main__':
-    sendsms(1861001711, 'test')
+    sendsms(1861001711, 'test'*100)
