@@ -27,7 +27,7 @@ def parse_page(page_content):
             rate = rate[0] if len(rate) else 0
             result = [author, content, created_on, rate]
             results.append(result)
-#            logging.debug(f'result: {result}')
+            # logging.debug(f'result: {result}')
         except Exception as e:
             logging.error(f'抽取时有错误发生：{e}')
     
