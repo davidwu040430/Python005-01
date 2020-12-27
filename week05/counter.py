@@ -9,7 +9,6 @@ def counter(vedio_id):
 
 
 def main():
-
     vedio_id = '10001'
     count = counter(vedio_id)
     print('{}: {}'.format(vedio_id, count))
