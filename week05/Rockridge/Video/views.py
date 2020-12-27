@@ -7,7 +7,7 @@ def video_list(request):
     vlist = [1001, 1002, 1003, 1004, 1005]
     conn = get_redis_connection("default")
     vid = request.GET.get('vid')
-    # 如果有参数vid，就vid所在的计数器加1
+    # 如果有参数vid，如果vid在列表中，vid所在的计数器加1，如果不再列表中，说明是非法参数，给出错误信息，不增加计数器
     if int(vid) in vlist:
         conn.incr(vid)
     else:
