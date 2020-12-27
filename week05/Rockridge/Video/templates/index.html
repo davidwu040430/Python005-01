@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>视频列表</title>
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+    <script src="{% static "js/jquery.slim.min.js" %}"></script>
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
+
+</head>
+<body>
+<div class="container">
+    <h3 class="mt-5 mb-3">视频列表 </h3>
+    <table class="table">
+        <thead class="thead-light">
+        <tr>
+            <th scope="col">VID</th>
+            <th scope="col">点击数</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for vc in vcount %}
+        <tr>
+            <th><a href="?vid={{vc.0}}">{{ vc.0 }}</a></th>
+            <td>{{ vc.1 }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
