@@ -12,8 +12,12 @@
 
 </head>
 <body>
+
 <div class="container">
     <h3 class="mt-5 mb-3">视频列表 </h3>
+    {% if error %}
+    <h4>{{ error }}</h4>
+    {% endif %}
     <table class="table">
         <thead class="thead-light">
         <tr>
