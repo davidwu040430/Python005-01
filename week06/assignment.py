@@ -1,4 +1,4 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 # 动物
 
@@ -12,6 +12,10 @@ class Animal(metaclass=ABCMeta):
     @property
     def is_fierce(self):
         return self.body_size != '小' and self.food_type == '食肉' and self.character == '凶猛'
+
+    @abstractmethod
+    def is_pettable(self):
+        pass
 
 # 猫
 
@@ -64,6 +68,8 @@ if __name__ == '__main__':
     cat1 = Cat('大花猫 1', '食肉', '小', '温顺')
     # 增加一只猫到动物园
     z.add_animal(cat1)
-    print(z.__dict__)
     # 动物园是否有猫这种动物
     have_cat = hasattr(z, 'Cat')
+
+    # 测试abc
+    # a = Animal('a', 'b', 'c')
